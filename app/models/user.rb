@@ -2,7 +2,7 @@ class User < ApplicationRecord
   include Authenticable
 
   has_many :followings
-  has_many :chats
+  has_many :chats, dependent: :destroy
   has_many :messages
   has_many :posts
   has_many :photos, through: :posts
