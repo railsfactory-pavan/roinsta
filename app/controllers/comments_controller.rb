@@ -15,7 +15,9 @@ class CommentsController < ApplicationController
 
   # POST /comments
   def create
-    @comment = Comment.new(comment_params)
+    @comment = Comment.new body: params[:body],
+                           user_id: @current_user.id,
+                           post_id: params[:post_id]
 
     if @comment.save
       render json: @comment, status: :created, location: @comment
@@ -26,7 +28,10 @@ class CommentsController < ApplicationController
 
   # PATCH/PUT /comments/1
   def update
-    if @comment.update(comment_params)
+    if @comment.update body: params[:body],
+                       user_id: @current_user.id,
+                       post_id: params[:post_id]
+
       render json: @comment
     else
       render json: @comment.errors, status: :unprocessable_entity
@@ -35,17 +40,14 @@ class CommentsController < ApplicationController
 
   # DELETE /comments/1
   def destroy
-    @comment.destroy
+    if @comment.destroy
+      render json: 'Comment deleted', status: :ok
+    end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_comment
-      @comment = Comment.find(params[:id])
-    end
-
-    # Only allow a trusted parameter "white list" through.
-    def comment_params
-      params.require(:comment).permit(:body, :user_id, :post_id)
-    end
+  
+  def set_comment
+    @comment = Comment.find(params[:id])
+  end
 end

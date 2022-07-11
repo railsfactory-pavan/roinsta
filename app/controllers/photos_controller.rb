@@ -15,7 +15,8 @@ class PhotosController < ApplicationController
 
   # POST /photos
   def create
-    @photo = Photo.new(photo_params)
+    @photo = Photo.new image: params[:image],
+                       post_id: @current_user.id
 
     if @photo.save
       render json: @photo, status: :created, location: @photo
@@ -26,7 +27,9 @@ class PhotosController < ApplicationController
 
   # PATCH/PUT /photos/1
   def update
-    if @photo.update(photo_params)
+    if @photo.update image: params[:image],
+                     post_id: @current_user.id
+
       render json: @photo
     else
       render json: @photo.errors, status: :unprocessable_entity
@@ -35,17 +38,14 @@ class PhotosController < ApplicationController
 
   # DELETE /photos/1
   def destroy
-    @photo.destroy
+    if @photo.destroy
+      render json: 'Photo deleted', status: :ok
+    end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_photo
-      @photo = Photo.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def photo_params
-      params.require(:photo).permit(:image, :post_id)
-    end
+  def set_photo
+    @photo = Photo.find(params[:id])
+  end
 end

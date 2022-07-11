@@ -15,7 +15,8 @@ class LikesController < ApplicationController
 
   # POST /likes
   def create
-    @like = Like.new(like_params)
+    @like = Like.new post_id: params[:post_id],
+                     user_id: @current_user.id
 
     if @like.save
       render json: @like, status: :created, location: @like
@@ -26,7 +27,9 @@ class LikesController < ApplicationController
 
   # PATCH/PUT /likes/1
   def update
-    if @like.update(like_params)
+    if @like.update post_id: params[:post_id],
+                    user_id: @current_user.id
+
       render json: @like
     else
       render json: @like.errors, status: :unprocessable_entity
@@ -35,17 +38,14 @@ class LikesController < ApplicationController
 
   # DELETE /likes/1
   def destroy
-    @like.destroy
+    if @like.destroy
+      render json: 'Like deleted', status: :ok
+    end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_like
-      @like = Like.find(params[:id])
-    end
-
-    # Only allow a trusted parameter "white list" through.
-    def like_params
-      params.require(:like).permit(:post_id, :user_id)
-    end
+  
+  def set_like
+    @like = Like.find(params[:id])
+  end
 end

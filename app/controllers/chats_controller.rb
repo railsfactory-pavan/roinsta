@@ -73,19 +73,15 @@ class ChatsController < ApplicationController
 
   # DELETE /chats/1
   def destroy
-    if @current_user.present?
-      if @chat.destroy
-        render json: 'Chat deleted', status: :ok
-      end
+    if @chat.destroy
+      render json: 'Chat deleted', status: :ok
     end
   end
 
   # DELETE /chats/destroy_message
   def destroy_message
-    if @current_user.present?
-      if @message.destroy
-        render json: 'Message deleted', status: :ok
-      end
+    if @message.destroy
+      render json: 'Message deleted', status: :ok
     end
   end
 

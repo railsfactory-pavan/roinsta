@@ -15,7 +15,8 @@ class PostsController < ApplicationController
 
   # POST /posts
   def create
-    @post = Post.new(post_params)
+    @post = Post.new location: params[:location],
+                     user_id: @current_user.id
 
     if @post.save
       render json: @post, status: :created, location: @post
@@ -26,7 +27,9 @@ class PostsController < ApplicationController
 
   # PATCH/PUT /posts/1
   def update
-    if @post.update(post_params)
+    if @post.update location: params[:location],
+                    user_id: @current_user.id
+
       render json: @post
     else
       render json: @post.errors, status: :unprocessable_entity
@@ -35,17 +38,14 @@ class PostsController < ApplicationController
 
   # DELETE /posts/1
   def destroy
-    @post.destroy
+    if @post.destroy
+      render json: 'Post deleted', status: :ok
+    end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_post
-      @post = Post.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def post_params
-      params.require(:post).permit(:location, :user_id)
-    end
+  def set_post
+    @post = Post.find(params[:id])
+  end
 end
