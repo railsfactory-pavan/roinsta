@@ -16,7 +16,7 @@ class PhotosController < ApplicationController
   # POST /photos
   def create
     @photo = Photo.new image: params[:image],
-                       post_id: @current_user.id
+                       post_id: params[:post_id]
 
     if @photo.save
       render json: @photo, status: :created, location: @photo
@@ -28,7 +28,7 @@ class PhotosController < ApplicationController
   # PATCH/PUT /photos/1
   def update
     if @photo.update image: params[:image],
-                     post_id: @current_user.id
+                     post_id: params[:post_id]
 
       render json: @photo
     else
