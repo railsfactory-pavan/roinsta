@@ -6,12 +6,20 @@ class UsersController < ApplicationController
   def index
     @users = User.all
 
-    render json: @users
+    if @users.present?
+      render_success_response({
+        users: single_serializer.new(@users, each_serializer: UsersSerializer)
+      }, 'Users fetched successfully')
+    else
+      render_unprocessable_entity('Users not found') unless @users.present?
+    end
   end
 
   # GET /users/1
   def show
-    render json: @user
+    render_success_response({
+      user: single_serializer.new(@user, serializer: UsersSerializer)
+    }, 'User fetched successfully')
   end
 
   # POST /users
@@ -19,36 +27,42 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
 
     if @user.save
-      render json: @user, status: :created, location: @user
+      render_success_response({
+        user: single_serializer.new(@user, each_serializer: UsersSerializer)
+      }, 'Users created successfully')
     else
-      render json: @user.errors, status: :unprocessable_entity
+      render_unprocessable_entity_response(@user)
     end
   end
 
   # PATCH/PUT /users/1
   def update
     if @user.update(user_params)
-      render json: @user
+      render_success_response({
+        user: single_serializer.new(@user, each_serializer: UsersSerializer)
+      }, 'Users updated successfully')
     else
-      render json: @user.errors, status: :unprocessable_entity
+      render_unprocessable_entity_response(@user)
     end
   end
 
   # DELETE /users/1
   def destroy
     if @user.destroy
-      render json: 'User deleted', status: :ok
+      render_success_response({
+        user: {}
+      }, 'User destroyed successfully')
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_user
-      @user = User.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def user_params
-      params.permit(:email, :password, :full_name, :user_name, :about, :avatar, :followers_count, :following_count)
-    end
+  def set_user
+    @user = User.find(params[:id])
+    render_unprocessable_entity('User not found') unless @user.present?
+  end
+
+  def user_params
+    params.permit(:email, :password, :full_name, :user_name, :about, :avatar, :followers_count, :following_count)
+  end
 end

@@ -1,5 +1,8 @@
 class ApplicationController < ActionController::API
   include JsonWebToken
+  include ExceptionMethods
+  include ResponseMethods
+  include SerializersMethods
 
   before_action :authenticate_request
 
