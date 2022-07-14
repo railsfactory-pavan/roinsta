@@ -5,12 +5,20 @@ class PostsController < ApplicationController
   def index
     @posts = Post.all
 
-    render json: @posts
+    if @posts.present?
+      render_success_response({
+        posts: single_serializer.new(@posts, each_serializer: PostsSerializer)
+      }, 'Posts fetched successfully')
+    else
+      render_unprocessable_entity('Posts not found') unless @posts.present?
+    end
   end
 
   # GET /posts/1
   def show
-    render json: @post
+    render_success_response({
+      post: single_serializer.new(@post, serializer: PostsSerializer)
+    }, 'Post fetched successfully')
   end
 
   # POST /posts
@@ -19,9 +27,11 @@ class PostsController < ApplicationController
                      user_id: @current_user.id
 
     if @post.save
-      render json: @post, status: :created, location: @post
+      render_success_response({
+        post: single_serializer.new(@post, each_serializer: PostsSerializer)
+      }, 'Post created successfully')
     else
-      render json: @post.errors, status: :unprocessable_entity
+      render_unprocessable_entity_response(@post)
     end
   end
 
@@ -30,16 +40,20 @@ class PostsController < ApplicationController
     if @post.update location: params[:location],
                     user_id: @current_user.id
 
-      render json: @post
+      render_success_response({
+        post: single_serializer.new(@post, each_serializer: PostsSerializer)
+      }, 'Post updated successfully')
     else
-      render json: @post.errors, status: :unprocessable_entity
+      render_unprocessable_entity_response(@post)
     end
   end
 
   # DELETE /posts/1
   def destroy
     if @post.destroy
-      render json: 'Post deleted', status: :ok
+      render_success_response({
+        post: {}
+      }, 'Post destroyed successfully')
     end
   end
 
@@ -47,5 +61,6 @@ class PostsController < ApplicationController
 
   def set_post
     @post = Post.find(params[:id])
+    render_unprocessable_entity('Post not found') unless @post.present?
   end
 end

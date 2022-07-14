@@ -1,16 +1,21 @@
 class ChatsController < ApplicationController
   before_action :set_chat, only: [:show, :update, :destroy]
-  before_action :set_message, only: [:update, :destroy_message]
+  before_action :set_message, only: [:update_message, :destroy_message]
 
   # GET /chats
   def index
     @chats = Chat.all
-    @messages = Message.where chat_id: @chats.ids
+    @messages = Message.all
 
-    render json: {
-      chats:  @chats,
-      messages: @messages
-    }
+    if @chats.present? or @messages.present?
+      render json: {
+        information: 'Data fetched successfully',
+        chats: single_serializer.new(@chats, each_serializer: ChatsSerializer),
+        messages: single_serializer.new(@messages, each_serializer: MessagesSerializer)
+      }
+    else
+      render_unprocessable_entity('Chats or messages not found') unless @chats.present? or @messages.present?
+    end
   end
 
   # GET /chats/1
@@ -18,8 +23,9 @@ class ChatsController < ApplicationController
     @messages = Message.where chat_id: @chat.id
 
     render json: {
-      chat: @chat,
-      messages: @messages
+      information: 'Data showes successfully',
+      chat: single_serializer.new(@chat, each_serializer: ChatsSerializer),
+      messages: single_serializer.new(@messages, each_serializer: MessagesSerializer)
     }
   end
 
@@ -34,8 +40,9 @@ class ChatsController < ApplicationController
                                             chat_id: @chat.id
 
       render json: {
-        chat: @chat,
-        message: @message
+        information: 'Data created successfully',
+        chat: single_serializer.new(@chat, each_serializer: ChatsSerializer),
+        message: single_serializer.new(@message, each_serializer: MessagesSerializer)
       }, status: :created, location: {
         chat: @chat,
         message: @message
@@ -54,19 +61,27 @@ class ChatsController < ApplicationController
                     recipient_id: params[:recipient_id]
 
       if @chat.present?
-        @message.update body: params[:body],
-                        user_id: @current_user.id,
-                        chat_id: @chat.id
-
-        render json: {
-          chat: @chat,
-          message: @message
-        }
+        render_success_response({
+          chat: single_serializer.new(@chat, each_serializer: ChatsSerializer)
+        }, 'Chat updated successfully')
      else
-        render json: {
-          chat_errors: @chat.errors,
-          message_error: @message.errors
-        }, status: :unprocessable_entity
+        render_unprocessable_entity_response(@chat)
+      end
+    end
+  end
+
+  # PATCH/PUT chats/update_message
+  def update_message
+    if @message.update body: params[:body],
+                       user_id: @current_user.id,
+                       chat_id: params[:chat_id]
+
+      if @message.present?
+        render_success_response({
+          message: single_serializer.new(@message, each_serializer: MessagesSerializer)
+        }, 'Message updated successfully')
+      else
+        render_unprocessable_entity_response(@message)
       end
     end
   end
@@ -74,14 +89,18 @@ class ChatsController < ApplicationController
   # DELETE /chats/1
   def destroy
     if @chat.destroy
-      render json: 'Chat deleted', status: :ok
+      render_success_response({
+        chat: {}
+      }, 'Chat destroyed successfully')
     end
   end
 
   # DELETE /chats/destroy_message
   def destroy_message
     if @message.destroy
-      render json: 'Message deleted', status: :ok
+      render_success_response({
+        message: {}
+      }, 'Message destroyed successfully')
     end
   end
 
@@ -92,6 +111,6 @@ class ChatsController < ApplicationController
   end
 
   def set_message
-    @message = Message.find(params[:id])
+    @message = Message.find(params[:id] || params[:message_id])
   end
 end

@@ -8,17 +8,24 @@ class FollowingsController < ApplicationController
     @my_followers = Following.where following_id: @current_user.id
     @my_followers_count = @my_followers.count
 
-    render json: {
-      my_followings:  @my_followings,
-      my_followings_count: @my_followings_count,
-      my_followers: @my_followers,
-      my_followers_count: @my_followers_count
-    }
+    if @my_followings.present? or @my_followers.present?
+      render json: {
+        information: 'Data fetched successfully',
+        my_followings:  single_serializer.new(@my_followings, each_serializer: FollowingsSerializer),
+        my_followings_count: @my_followings_count,
+        my_followers: single_serializer.new(@my_followers, each_serializer: FollowingsSerializer),
+        my_followers_count: @my_followers_count
+      }
+    else
+      render_unprocessable_entity('Followings or followers not found') unless @my_followings.present? or @my_followers.present?
+    end
   end
 
   # GET /followings/1
   def show
-    render json: @following
+    render_success_response({
+      like: single_serializer.new(@following, serializer: FollowingsSerializer)
+    }, 'Following fetched successfully')
   end
 
   # POST /followings
@@ -27,9 +34,11 @@ class FollowingsController < ApplicationController
                                following_id: params[:following_id]
 
     if @following.save
-      render json: @following, status: :created, location: @following
+      render_success_response({
+        following: single_serializer.new(@following, each_serializer: FollowingsSerializer)
+      }, 'Following created successfully')
     else
-      render json: @following.errors, status: :unprocessable_entity
+      render_unprocessable_entity_response(@following)
     end
   end
 
@@ -38,16 +47,20 @@ class FollowingsController < ApplicationController
     if @following.update user_id: @current_user.id,
                          following_id: params[:following_id]
                          
-      render json: @following
+      render_success_response({
+        following: single_serializer.new(@following, each_serializer: FollowingsSerializer)
+      }, 'Following updated successfully')
     else
-      render json: @following.errors, status: :unprocessable_entity
+      render_unprocessable_entity_response(@following)
     end
   end
 
   # DELETE /followings/1
   def destroy
     if @following.destroy
-      render json: 'Following deleted', status: :ok
+      render_success_response({
+        following: {}
+      }, 'Following destroyed successfully')
     end
   end
 
@@ -55,5 +68,6 @@ class FollowingsController < ApplicationController
   
   def set_following
     @following = Following.find(params[:id])
+    render_unprocessable_entity('Following not found') unless @following.present?
   end
 end

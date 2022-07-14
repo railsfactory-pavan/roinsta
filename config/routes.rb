@@ -5,6 +5,8 @@ Rails.application.routes.draw do
 
   resources :chats do
     collection do
+      patch :update_message
+      put :update_message
       delete :destroy_message
     end
   end

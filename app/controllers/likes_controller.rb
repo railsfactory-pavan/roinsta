@@ -5,12 +5,20 @@ class LikesController < ApplicationController
   def index
     @likes = Like.all
 
-    render json: @likes
+    if @likes.present?
+      render_success_response({
+        likes: single_serializer.new(@likes, each_serializer: LikesSerializer)
+      }, 'Likes fetched successfully')
+    else
+      render_unprocessable_entity('Likes not found') unless @likes.present?
+    end
   end
 
   # GET /likes/1
   def show
-    render json: @like
+    render_success_response({
+      like: single_serializer.new(@like, serializer: LikesSerializer)
+    }, 'Like fetched successfully')
   end
 
   # POST /likes
@@ -19,9 +27,11 @@ class LikesController < ApplicationController
                      user_id: @current_user.id
 
     if @like.save
-      render json: @like, status: :created, location: @like
+      render_success_response({
+        like: single_serializer.new(@like, each_serializer: LikesSerializer)
+      }, 'Like created successfully')
     else
-      render json: @like.errors, status: :unprocessable_entity
+      render_unprocessable_entity_response(@like)
     end
   end
 
@@ -30,16 +40,20 @@ class LikesController < ApplicationController
     if @like.update post_id: params[:post_id],
                     user_id: @current_user.id
 
-      render json: @like
+      render_success_response({
+        like: single_serializer.new(@like, each_serializer: LikesSerializer)
+      }, 'Like updated successfully')
     else
-      render json: @like.errors, status: :unprocessable_entity
+      render_unprocessable_entity_response(@like)
     end
   end
 
   # DELETE /likes/1
   def destroy
     if @like.destroy
-      render json: 'Like deleted', status: :ok
+      render_success_response({
+        like: {}
+      }, 'Like destroyed successfully')
     end
   end
 
@@ -47,5 +61,6 @@ class LikesController < ApplicationController
   
   def set_like
     @like = Like.find(params[:id])
+    render_unprocessable_entity('Like not found') unless @like.present?
   end
 end
