@@ -9,5 +9,7 @@ module Authenticable
     validates :user_name, presence: true, uniqueness: true
     validates :password, length: { minimum: 6 },
                          if: -> { new_record? || !password.nil? }
+
+    validate :acceptable_image
   end
 end

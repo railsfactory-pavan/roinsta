@@ -5,6 +5,7 @@ class UsersSerializer < SerializersBase
              :user_name,
              :about,
              :avatar,
+             :avatar_url,
              :followings,
              :chats,
              :messages,
@@ -12,6 +13,12 @@ class UsersSerializer < SerializersBase
              :photos,
              :comments,
              :likes
+
+  def avatar_url
+    if object.avatar.attached?
+      rails_blob_path(object.avatar, only_path: true)
+    end
+  end
 
 
   def followings

@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
-  resources :users
+  resources :users do
+    get :avatar, on: :member
+  end
 
   resources :chats do
     collection do
@@ -19,5 +21,5 @@ Rails.application.routes.draw do
   resources :followings
 
   post '/auth/login', to: 'authentication#login'
-  get '/*a', to: 'application#not_found'
+  get '/*', to: 'application#not_found'
 end

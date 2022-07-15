@@ -12,4 +12,26 @@ class User < ApplicationRecord
   has_many :comments
   has_many :likes, dependent: :destroy
   has_many :likes
+
+  has_one_attached :avatar
+
+  private
+
+  def acceptable_image
+    return unless avatar.attached?
+
+    unless avatar.byte_size <= 1.megabyte
+      errors.add(:avatar, 'Avatar is too big')
+    end
+
+    acceptable_types = ["image/jpeg", "image/jpg", 'image/png']
+
+    unless acceptable_types.include?(avatar.content_type)
+      errors.add(:avatar, 'Avatar must be JPEG, JPG or PNG format')
+    end
+  end
+
+  def avatar_present?
+    errors.add(:avatar, :blank) unless avatar.attached?
+  end
 end
