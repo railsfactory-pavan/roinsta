@@ -14,7 +14,12 @@ Rails.application.routes.draw do
   end
 
   resources :posts
-  resources :photos
+  
+  resources :photos do
+    get :show_images, on: :member
+    post :add_images, on: :member
+  end
+  
   resources :comments
   resources :likes
 

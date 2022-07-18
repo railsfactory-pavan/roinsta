@@ -4,7 +4,7 @@ class UsersController < ApplicationController
 
   # GET /users
   def index
-    @users = User.all
+    @users = User.all.with_attached_avatar
 
     if @users.present?
       render_success_response({
@@ -22,6 +22,7 @@ class UsersController < ApplicationController
     }, 'User fetched successfully')
   end
 
+  # /users/:id/avatar
   def avatar
     if @user&.avatar&.attached?
 

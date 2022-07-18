@@ -1,9 +1,9 @@
 class PhotosController < ApplicationController
-  before_action :set_photo, only: [:show, :update, :destroy]
+  before_action :set_photo, only: [:show, :show_images, :add_images, :update, :destroy]
 
   # GET /photos
   def index
-    @photos = Photo.all
+    @photos = Photo.all.with_attached_images
 
     if @photos.present?
       render_success_response({
@@ -21,13 +21,31 @@ class PhotosController < ApplicationController
     }, 'Photo fetched successfully')
   end
 
+  # GET /photos/:id/show_images
+  def show_images
+    if @photo&.images&.attached?
+
+      @photo.images.map do |image|
+        return redirect_to rails_blob_url(image)
+      end
+
+    else
+      render json: 'Album dose not have images', status: :unauthorized
+    end
+  end
+
   # POST /photos
   def create
-    @photo = Photo.new image: params[:image],
-                       post_id: params[:post_id],
+    @photo = Photo.new post_id: params[:post_id],
                        user_id: @current_user.id
 
     if @photo.save
+      if params[:io].present? and params[:filename].present? and params[:content_type].present?
+        @photo.images.attach io: File.open(params[:io]),
+                             filename: params[:filename],
+                             content_type: params[:content_type]
+      end
+
       render_success_response({
         photo: single_serializer.new(@photo, each_serializer: PhotosSerializer)
       }, 'Photo created successfully')
@@ -36,11 +54,34 @@ class PhotosController < ApplicationController
     end
   end
 
+  # POST /photos/:id/add_many
+  def add_images
+    if @photo.present?
+      if params[:io].present? and params[:filename].present? and params[:content_type].present?
+          @photo.images.attach io: File.open(params[:io]),
+                               filename: params[:filename],
+                               content_type: params[:content_type]
+
+        render_success_response({
+          photo: single_serializer.new(@photo, each_serializer: PhotosSerializer)
+        }, 'Image attached successfully')
+      else
+        render_unprocessable_entity_response(@photo)
+      end
+    end
+  end
+
   # PATCH/PUT /photos/1
   def update
-    if @photo.update image: params[:image],
-                     post_id: params[:post_id],
+    if @photo.update post_id: params[:post_id],
                      user_id: @current_user.id
+      if @photo.images.attached?
+        if params[:io].present? or params[:filename].present? or params[:content_type].present?
+          @photo.images.attach io: File.open(params[:io]),
+                               filename: params[:filename],
+                               content_type: params[:content_type]
+        end
+      end
 
       render_success_response({
         photo: single_serializer.new(@photo, each_serializer: PhotosSerializer)
