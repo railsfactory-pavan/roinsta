@@ -3,6 +3,7 @@ class ApplicationController < ActionController::API
   include ExceptionMethods
   include ResponseMethods
   include SerializersMethods
+  include Rails::Pagination
 
   before_action :authenticate_request
 

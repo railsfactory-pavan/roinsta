@@ -3,15 +3,18 @@ class LikesController < ApplicationController
 
   # GET /likes
   def index
-    @likes = Like.all
+    @likes = Like.page params[:page] ? params[:page].to_i : 1
 
     if @likes.present?
       render_success_response({
-        likes: single_serializer.new(@likes, each_serializer: LikesSerializer)
+        likes: single_serializer.new(@likes, each_serializer: LikesSerializer),
+        meta: pagination_meta(@likes)
       }, 'Likes fetched successfully')
     else
       render_unprocessable_entity('Likes not found') unless @likes.present?
     end
+
+    # paginate json: @likes, per_page: 5
   end
 
   # GET /likes/1
