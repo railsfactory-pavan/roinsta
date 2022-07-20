@@ -15,6 +15,8 @@ class User < ApplicationRecord
 
   has_one_attached :avatar
 
+  geocoded_by :full_street_address
+
   private
 
   def acceptable_image

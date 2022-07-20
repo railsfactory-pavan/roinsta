@@ -11,5 +11,7 @@ module Authenticable
                          if: -> { new_record? || !password.nil? }
 
     validate :acceptable_image
+
+    after_validation :geocode
   end
 end
