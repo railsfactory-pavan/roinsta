@@ -13,6 +13,8 @@ class User < ApplicationRecord
   has_many :likes, dependent: :destroy
   has_many :likes
 
+  has_one :location
+
   has_one_attached :avatar
 
   geocoded_by :full_street_address

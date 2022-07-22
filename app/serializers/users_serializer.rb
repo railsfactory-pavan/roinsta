@@ -12,7 +12,8 @@ class UsersSerializer < SerializersBase
              :posts,
              :photos,
              :comments,
-             :likes
+             :likes,
+             :location
 
   def avatar_url
     if object.avatar.attached?
@@ -47,5 +48,9 @@ class UsersSerializer < SerializersBase
 
   def likes
     array_serializer.new(object.likes, serializer: LikesSerializer)
+  end
+
+  def location
+    array_serializer.new(object.location, serializer: LocationsSerializer)
   end
 end
