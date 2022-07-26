@@ -27,6 +27,9 @@ gem 'api-pagination'
 gem 'geocoder'
 gem 'bootstrap'
 
+gem 'redis'
+gem 'sidekiq'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
