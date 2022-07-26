@@ -9,9 +9,10 @@ class LocationsController < ApplicationController
       @locations = Location.near(params[:search], 10, :order => :distance)
     else
       @locations = Location.all.order("created_at DESC")
+      render_success_response({
+        locations: single_serializer.new(@locations, each_serializer: LocationsSerializer)
+      }, 'Locations fetched successfully')
     end
-
-    render json: @locations
   end
 
   # GET /locations/1
@@ -41,7 +42,11 @@ class LocationsController < ApplicationController
 
   # DELETE /locations/1
   def destroy
-    @location.destroy
+    if @location.destroy
+      render_success_response({
+        user: {}
+      }, 'Location destroyed successfully')
+    end
   end
 
   private
@@ -52,6 +57,6 @@ class LocationsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def location_params
-      params.require(:location).permit(:company_name, :address, :city, :postcode, :latitude, :longitude, :user_id)
+      params.permit(:id, :company_name, :address, :city, :postcode, :latitude, :longitude, :user_id)
     end
 end

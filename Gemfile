@@ -25,6 +25,7 @@ gem 'active_model_serializers'
 gem 'kaminari'
 gem 'api-pagination'
 gem 'geocoder'
+gem 'bootstrap'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
