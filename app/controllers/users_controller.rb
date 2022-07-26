@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   skip_before_action :authenticate_request, only: [:create]
-  before_action :set_user, only: [:show, :avatar, :update, :destroy]
+  before_action :set_user, only: [:show, :avatar, :update, :destroy, :submit_registration_ids]
 
   # GET /users
   def index
@@ -27,6 +27,11 @@ class UsersController < ApplicationController
     if @user&.avatar&.attached?
 
       redirect_to rails_blob_url(@user.avatar)
+
+      user_avatar_seen_notification(
+        @user,
+        "Avatar successfully seen by user"
+      )
     else
       render json: 'User dose not have a avatar', status: :unauthorized
     end
@@ -67,6 +72,24 @@ class UsersController < ApplicationController
       }, 'Users updated successfully')
     else
       render_unprocessable_entity_response(@user)
+    end
+  end
+
+  def submit_registration_ids
+    if @user.present?
+      if params[:registration_ids].present?
+        @user.registration_ids << params[:registration_ids]
+        if @user.save
+          render_success_response({
+          }, 'Registration ids submited successfully')
+        else
+          render_unprocessable_entity("Registration ids is not submited")
+        end
+      else
+        render_unprocessable_entity("Registration ids is not present")
+      end
+    else
+      render_unprocessable_entity("User is not present")
     end
   end
 

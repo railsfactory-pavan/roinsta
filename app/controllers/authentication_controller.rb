@@ -8,6 +8,11 @@ class AuthenticationController < ApplicationController
     if @user&.authenticate params[:password]
       token = jwt_encode user_id: @user.id
       exp_time = 1.days.from_now.to_i
+
+      PushNotification.user_login_notification(
+        @user,
+        "User has been login successfully"
+      )
       
       render json: {
         token: token,

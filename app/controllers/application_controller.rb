@@ -4,6 +4,7 @@ class ApplicationController < ActionController::API
   include ResponseMethods
   include SerializersMethods
   include Rails::Pagination
+  include PushNotification
 
   before_action :authenticate_request
 

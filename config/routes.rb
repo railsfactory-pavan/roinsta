@@ -3,6 +3,7 @@ Rails.application.routes.draw do
 
   resources :users do
     get :avatar, on: :member
+    patch '/submit_registration_ids', to: 'users#submit_registration_ids'
   end
 
   resources :chats do

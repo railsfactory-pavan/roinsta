@@ -30,6 +30,8 @@ gem 'bootstrap'
 gem 'redis'
 gem 'sidekiq'
 
+gem 'fcm'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 

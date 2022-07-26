@@ -19,6 +19,8 @@ class User < ApplicationRecord
 
   geocoded_by :full_street_address
 
+  serialize :registration_ids, Array
+
   private
 
   def acceptable_image
