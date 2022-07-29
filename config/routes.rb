@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :coffee_roasts
   resources :locations
 
   resources :users do

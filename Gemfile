@@ -32,6 +32,9 @@ gem 'sidekiq'
 
 gem 'fcm'
 
+gem 'twilio-ruby'
+gem 'twiml_template'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
