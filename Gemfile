@@ -35,6 +35,13 @@ gem 'fcm'
 gem 'twilio-ruby'
 gem 'twiml_template'
 
+gem 'devise'
+gem 'activeadmin'
+gem 'active_admin_flat_skin'
+gem 'sprockets'
+gem 'sass-rails'
+gem 'font-awesome-sass'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 

@@ -1,4 +1,4 @@
-class ApplicationController < ActionController::API
+class ApplicationController < ActionController::Base
   include JsonWebToken
   include ExceptionMethods
   include ResponseMethods
