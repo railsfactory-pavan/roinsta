@@ -42,6 +42,12 @@ gem 'sprockets'
 gem 'sass-rails'
 gem 'font-awesome-sass'
 
+# # Pending...
+# fast json
+# optimaization
+# servise objects
+# # #
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
